@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Verificación</title>
+</head>
+<body>
+  <h2>Verificando documento...</h2>
+  <div id="resultado"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const codigo = params.get("doc");
+
+    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQY5wlLFCiUEzC9A8TWkY7lO8fRWRS0utqvJWQUMx9KuWC-0uGDWXV6PN9yTIyHrcHxlZ3uW5EACJTB/pubhtml?gid=0&single=true&output=csv";
+
+    fetch(url)
+      .then(response => response.text())
+      .then(data => {
+        const filas = data.split("\n");
+
+        let encontrado = false;
+
+        filas.forEach(fila => {
+          const columnas = fila.split(",");
+          const id = columnas[0];
+
+          if (id === codigo) {
+            encontrado = true;
+          }
+        });
+
+        if (encontrado) {
+          document.getElementById("resultado").innerHTML = "✅ Documento VÁLIDO";
+        } else {
+          document.getElementById("resultado").innerHTML = "❌ Documento NO VÁLIDO";
+        }
+      });
+  </script>
+</body>
+</html>
