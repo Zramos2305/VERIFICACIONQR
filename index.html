@@ -11,7 +11,7 @@
     const params = new URLSearchParams(window.location.search);
     const codigo = params.get("doc");
 
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQY5wlLFCiUEzC9A8TWkY7lO8fRWRS0utqvJWQUMx9KuWC-0uGDWXV6PN9yTIyHrcHxlZ3uW5EACJTB/pubhtml?gid=0&single=true&output=csv";
+    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQY5wlLFCiUEzC9A8TWkY7lO8fRWRS0utqvJWQUMx9KuWC-0uGDWXV6PN9yTIyHrcHxlZ3uW5EACJTB/pub?output=csv";
 
     fetch(url)
       .then(response => response.text())
