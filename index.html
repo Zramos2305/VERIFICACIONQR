@@ -1,76 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Verificación</title>
-
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f1f5f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .card {
-      background: white;
-      padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      width: 400px;
-      text-align: center;
-    }
-
-    .header {
-      border-bottom: 2px solid #e5e7eb;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-    }
-
-    .valido {
-      color: #16a34a;
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .invalido {
-      color: #dc2626;
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .nombre {
-      font-size: 20px;
-      margin: 15px 0;
-      font-weight: bold;
-    }
-
-    .info {
-      margin: 5px 0;
-      color: #374151;
-    }
-
-    .footer {
-      margin-top: 20px;
-      font-size: 13px;
-      color: #6b7280;
-      background: #f9fafb;
-      padding: 10px;
-      border-radius: 8px;
-    }
-  </style>
+  <title>Verificación de Documento</title>
 </head>
 
-<body>
+<body style="margin:0; font-family: 'Segoe UI', Arial; background:#eef2f7;">
 
-  <div class="card">
-
-    <div class="header">
-      <h2>Verificación de Documento</h2>
+  <div style="max-width:500px; margin:60px auto; background:white; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); overflow:hidden;">
+    
+    <!-- HEADER -->
+    <div style="background:#1e3a5f; color:white; padding:20px; text-align:center;">
+      <img src="logo.png" width="70" style="margin-bottom:10px;">
+      <h2 style="margin:0;">Verificación Oficial</h2>
+      <p style="margin:5px 0 0; font-size:14px;">Sistema de autenticidad documental</p>
     </div>
 
-    <div id="resultado"></div>
+    <!-- CONTENIDO -->
+    <div style="padding:25px; text-align:center;">
+      <div id="resultado">🔄 Verificando documento...</div>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="background:#f1f1f1; text-align:center; padding:10px; font-size:12px; color:#555;">
+      Documento validado digitalmente
+    </div>
 
   </div>
 
@@ -94,41 +47,51 @@
 
     if (!codigo) {
       document.getElementById("resultado").innerHTML = `
-        <div class="invalido">❌ Código no proporcionado</div>
+        <div style="color:#dc2626; font-size:22px; margin-bottom:15px;">
+          ❌ Código no proporcionado
+        </div>
       `;
     } else {
 
-      db.collection("documentos").doc(codigo).get().then(doc => {
+      db.collection("documentos").doc(codigo).get()
+      .then(doc => {
 
         if (doc.exists) {
 
           const data = doc.data();
 
           document.getElementById("resultado").innerHTML = `
-            <div class="valido">✅ DOCUMENTO VÁLIDO</div>
+            <div style="color:#16a34a; font-size:22px; margin-bottom:15px;">
+              ✅ DOCUMENTO VÁLIDO
+            </div>
 
-            <div class="nombre">${data.nombre}</div>
+            <h3 style="margin:10px 0;">${data.nombre}</h3>
 
-            <div class="info"><strong>Código:</strong> ${codigo}</div>
-            <div class="info"><strong>Tipo:</strong> ${data.tipo_documento}</div>
-            <div class="info"><strong>Estado:</strong> ${data.estado}</div>
+            <p style="margin:5px;"><strong>Código:</strong> ${codigo}</p>
+            <p style="margin:5px;"><strong>Tipo:</strong> ${data.tipo_documento}</p>
+            <p style="margin:5px;"><strong>Estado:</strong> ${data.estado}</p>
 
-            <div class="footer">
-              Este documento ha sido verificado en el sistema institucional.
+            <div style="margin-top:20px; padding:10px; background:#ecfdf5; border-radius:8px; font-size:14px;">
+              Este documento ha sido verificado correctamente en el sistema institucional.
             </div>
           `;
 
         } else {
 
           document.getElementById("resultado").innerHTML = `
-            <div class="invalido">❌ DOCUMENTO NO VÁLIDO</div>
-
-            <div class="footer">
-              El código no se encuentra registrado en el sistema.
+            <div style="color:#dc2626; font-size:22px; margin-bottom:15px;">
+              ❌ DOCUMENTO NO VÁLIDO
             </div>
+
+            <p style="font-size:14px; color:#555;">
+              El código ingresado no se encuentra registrado en el sistema.
+            </p>
           `;
         }
 
+      })
+      .catch(error => {
+        console.error(error);
       });
 
     }
