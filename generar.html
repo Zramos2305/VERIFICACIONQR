@@ -19,6 +19,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+  <!-- LIBRERIA QR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAxcjIRGV1eg59e8fJXZZaZzLcdXfa3lQI",
@@ -48,13 +51,28 @@
         tipo_documento: tipo,
         estado: "válido"
       }).then(() => {
-        const link = "https://zramos2305.github.io/VERIFICACIONQR/?doc=" + codigo;
+  const link = "https://zramos2305.github.io/VERIFICACIONQR/?doc=" + codigo;
 
-        document.getElementById("resultado").innerHTML = `
-          <p><strong>Código:</strong> ${codigo}</p>
-          <a href="${link}" target="_blank">Verificar</a>
-        `;
-      });
+  document.getElementById("resultado").innerHTML = `
+    <div style="margin-top:20px;">
+      <h3 style="color:#16a34a;">✅ Documento creado</h3>
+
+      <p><strong>Código:</strong> ${codigo}</p>
+
+      <div id="qr" style="margin:20px auto;"></div>
+
+      <a href="${link}" target="_blank">🔍 Verificar documento</a>
+    </div>
+  `;
+
+  // GENERAR QR
+  new QRCode(document.getElementById("qr"), {
+    text: link,
+    width: 150,
+    height: 150
+  });
+
+})
     }
   </script>
 
