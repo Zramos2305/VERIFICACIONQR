@@ -1,90 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Verificación de Documento</title>
+  <title>Verificación</title>
 </head>
 
-<body style="margin:0; font-family: 'Segoe UI', Arial; background:#eef2f7;">
+<body style="font-family: Arial; text-align:center; padding:40px;">
 
-  <div style="max-width:500px; margin:60px auto; background:white; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); overflow:hidden;">
-    
-    <!-- HEADER -->
-    <div style="background:#1e3a5f; color:white; padding:20px; text-align:center;">
-  
-  <img src="logo.png" width="90" style="margin-bottom:10px;">
-  
-  <h2 style="margin:0;">Verificación Oficial</h2>
-  <p style="margin:5px 0 0; font-size:14px;">Sistema de autenticidad documental</p>
+  <h2>Verificando documento...</h2>
 
-</div>
+  <div id="resultado"></div>
 
-    <!-- CONTENIDO -->
-    <div style="padding:25px; text-align:center;">
-      <div id="resultado">🔄 Verificando documento...</div>
-    </div>
-
-    <!-- FOOTER -->
-    <div style="background:#f1f1f1; text-align:center; padding:10px; font-size:12px; color:#555;">
-      Documento validado digitalmente
-    </div>
-
-  </div>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAxcjIRGV1eg59e8fJXZZaZzLcdXfa3lQI",
+      authDomain: "fundacion-isla-cascajal.firebaseapp.com",
+      projectId: "fundacion-isla-cascajal",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     const params = new URLSearchParams(window.location.search);
-    const codigo = params.get("doc");
+    const codigo = params.get("doc")?.trim().toUpperCase();
 
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQY5wlLFCiUEzC9A8TWkY7lO8fRWRS0utqvJWQUMx9KuWC-0uGDWXV6PN9yTIyHrcHxlZ3uW5EACJTB/pub?output=csv";
+    if (!codigo) {
+      document.getElementById("resultado").innerHTML = "❌ Código no proporcionado";
+    } else {
 
-    fetch(url)
-      .then(response => response.text())
-      .then(data => {
-        const filas = data.split("\n");
+      db.collection("documentos").doc(codigo).get().then(doc => {
 
-        let encontrado = false;
-        let nombre = "";
-        let estado = "";
+        if (doc.exists) {
+          const data = doc.data();
 
-        filas.forEach(fila => {
-          const columnas = fila.split(",");
-          const id = columnas[0].trim();
-
-          if (id === codigo.trim()) {
-            encontrado = true;
-            nombre = columnas[1];
-            tipo_documento = columnas[2];
-            estado = columnas[3];
-          }
-        });
-
-        if (encontrado) {
           document.getElementById("resultado").innerHTML = `
-            <div style="color:#16a34a; font-size:22px; margin-bottom:15px;">
+            <div style="color:#16a34a; font-size:22px;">
               ✅ DOCUMENTO VÁLIDO
             </div>
 
-            <h3 style="margin:10px 0;">${nombre}</h3>
-
-            <p style="margin:5px;"><strong>Código:</strong> ${codigo}</p>
-            <p style="margin:5px;"><strong>Tipo de documento:</strong> ${tipo_documento}</p>
-             <p style="margin:5px;"><strong>Estado:</strong> ${estado}</p>
-
-            <div style="margin-top:20px; padding:10px; background:#ecfdf5; border-radius:8px; font-size:14px;">
-              Este documento ha sido verificado correctamente en el sistema institucional.
-            </div>
+            <h3>${data.nombre}</h3>
+            <p><strong>Código:</strong> ${codigo}</p>
+            <p><strong>Tipo:</strong> ${data.tipo_documento}</p>
+            <p><strong>Estado:</strong> ${data.estado}</p>
           `;
         } else {
-          document.getElementById("resultado").innerHTML = `
-            <div style="color:#dc2626; font-size:22px; margin-bottom:15px;">
-              ❌ DOCUMENTO NO VÁLIDO
-            </div>
-
-            <p style="font-size:14px; color:#555;">
-              El código ingresado no se encuentra registrado en el sistema.
-            </p>
-          `;
+          document.getElementById("resultado").innerHTML = "❌ DOCUMENTO NO VÁLIDO";
         }
+
       });
+
+    }
   </script>
 
 </body>
