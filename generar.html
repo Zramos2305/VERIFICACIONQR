@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generar Documento</title>
+</head>
+
+<body style="font-family: Arial; text-align:center; padding:40px;">
+
+  <h2>Crear Documento</h2>
+  <h1>PRUEBA</h1>
+
+  <input id="nombre" placeholder="Nombre"><br><br>
+  <input id="tipo" placeholder="Tipo de documento"><br><br>
+
+  <button onclick="crearDocumento()">Generar</button>
+
+  <div id="resultado" style="margin-top:20px;"></div>
+
+  <script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAxcjIRGV1eg59e8fJXZZaZzLcdXfa3lQI",
+      authDomain: "fundacion-isla-cascajal.firebaseapp.com",
+      projectId: "fundacion-isla-cascajal",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function generarCodigo() {
+      const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let codigo = "DOC-";
+
+      for (let i = 0; i < 8; i++) {
+        codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+      }
+
+      return codigo;
+    }
+
+    window.crearDocumento = async function () {
+
+      const nombre = document.getElementById("nombre").value;
+      const tipo = document.getElementById("tipo").value;
+
+      const codigo = generarCodigo();
+
+      await setDoc(doc(db, "documentos", codigo), {
+        nombre: nombre,
+        tipo_documento: tipo,
+        estado: "válido"
+      });
+
+      const link = "https://zramos2305.github.io/VERIFICACIONQR/?doc=" + codigo;
+
+      document.getElementById("resultado").innerHTML = `
+        <p><strong>Código:</strong> ${codigo}</p>
+        <p><a href="${link}" target="_blank">Verificar</a></p>
+      `;
+    }
+
+  </script>
+
+</body>
+</html>
