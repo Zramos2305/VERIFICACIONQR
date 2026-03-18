@@ -2,27 +2,123 @@
 <html>
 <head>
   <title>Generar Documento</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial;
+      background: #eef2f7;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 60px auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .header {
+      background: #1e3a5f;
+      color: white;
+      padding: 20px;
+    }
+
+    .header img {
+      width: 70px;
+      margin-bottom: 10px;
+    }
+
+    .form {
+      padding: 25px;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #1e3a5f;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #162c47;
+    }
+
+    #qr {
+      margin: 20px auto;
+    }
+
+    .footer {
+      background: #f1f1f1;
+      padding: 10px;
+      font-size: 12px;
+      color: #555;
+    }
+
+    .descargar {
+      display: inline-block;
+      margin-top: 10px;
+      background: #16a34a;
+    }
+
+    .descargar:hover {
+      background: #15803d;
+    }
+  </style>
 </head>
 
-<body style="font-family: Arial; text-align:center; padding:40px;">
+<body>
 
-  <h2>Crear Documento</h2>
+  <div class="container">
 
-  <input id="nombre" placeholder="Nombre"><br><br>
-  <input id="tipo" placeholder="Tipo de documento"><br><br>
+    <!-- HEADER -->
+    <div class="header">
+      <img src="logo.png">
+      <h2>Generar Documento</h2>
+      <p>Sistema institucional</p>
+    </div>
 
-  <button onclick="crearDocumento()">Generar</button>
+    <!-- FORM -->
+    <div class="form">
 
-  <div id="resultado"></div>
+      <input id="nombre" placeholder="Nombre completo">
+      <input id="tipo" placeholder="Tipo de documento">
+
+      <button onclick="crearDocumento()">Generar Documento</button>
+
+      <div id="resultado"></div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      Generador oficial de documentos
+    </div>
+
+  </div>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <!-- LIBRERIA QR -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- QR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <script>
+
     const firebaseConfig = {
       apiKey: "AIzaSyAxcjIRGV1eg59e8fJXZZaZzLcdXfa3lQI",
       authDomain: "fundacion-isla-cascajal.firebaseapp.com",
@@ -42,6 +138,7 @@
     }
 
     function crearDocumento() {
+
       const nombre = document.getElementById("nombre").value;
       const tipo = document.getElementById("tipo").value;
       const codigo = generarCodigo();
@@ -50,30 +147,48 @@
         nombre: nombre,
         tipo_documento: tipo,
         estado: "válido"
-      }).then(() => {
-  const link = "https://zramos2305.github.io/VERIFICACIONQR/?doc=" + codigo;
+      })
+      .then(() => {
 
-  document.getElementById("resultado").innerHTML = `
-    <div style="margin-top:20px;">
-      <h3 style="color:#16a34a;">✅ Documento creado</h3>
+        const link = "https://zramos2305.github.io/VERIFICACIONQR/?doc=" + codigo;
 
-      <p><strong>Código:</strong> ${codigo}</p>
+        document.getElementById("resultado").innerHTML = `
+          <h3 style="color:#16a34a;">✅ Documento creado</h3>
 
-      <div id="qr" style="margin:20px auto;"></div>
+          <p><strong>${codigo}</strong></p>
 
-      <a href="${link}" target="_blank">🔍 Verificar documento</a>
-    </div>
-  `;
+          <div id="qr"></div>
 
-  // GENERAR QR
-  new QRCode(document.getElementById("qr"), {
-    text: link,
-    width: 150,
-    height: 150
-  });
+          <a href="${link}" target="_blank">🔍 Verificar documento</a><br>
 
-})
+          <button class="descargar" onclick="descargarQR()">⬇ Descargar QR</button>
+        `;
+
+        // Generar QR
+        new QRCode(document.getElementById("qr"), {
+          text: link,
+          width: 180,
+          height: 180
+        });
+
+      });
+
     }
+
+    function descargarQR() {
+      const qrCanvas = document.querySelector("#qr canvas");
+
+      if (!qrCanvas) {
+        alert("QR aún no generado");
+        return;
+      }
+
+      const enlace = document.createElement("a");
+      enlace.href = qrCanvas.toDataURL("image/png");
+      enlace.download = "qr-documento.png";
+      enlace.click();
+    }
+
   </script>
 
 </body>
