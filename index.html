@@ -52,7 +52,8 @@
           if (id === codigo.trim()) {
             encontrado = true;
             nombre = columnas[1];
-            estado = columnas[2];
+            tipo_documento = columnas[2];
+            estado = columnas[3];
           }
         });
 
@@ -65,7 +66,8 @@
             <h3 style="margin:10px 0;">${nombre}</h3>
 
             <p style="margin:5px;"><strong>Código:</strong> ${codigo}</p>
-            <p style="margin:5px;"><strong>Estado:</strong> ${estado}</p>
+            <p style="margin:5px;"><strong>Tipo de documento:</strong> ${tipo_documento}</p>
+             <p style="margin:5px;"><strong>Estado:</strong> ${estado}</p>
 
             <div style="margin-top:20px; padding:10px; background:#ecfdf5; border-radius:8px; font-size:14px;">
               Este documento ha sido verificado correctamente en el sistema institucional.
