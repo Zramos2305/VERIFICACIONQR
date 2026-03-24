@@ -96,15 +96,14 @@
       <input id="nombre" placeholder="Nombre completo">
       <input id="cedula" placeholder="Cédula">
 
-      <!-- 🔥 NUEVO -->
       <select id="tipo">
         <option value="">Seleccione tipo</option>
         <option value="certificado">Certificado</option>
         <option value="afiliado">Afiliado</option>
       </select>
 
-      <!-- 🔥 SOLO PARA CERTIFICADO -->
-      <input id="evento" placeholder="Nombre del evento (solo certificados)">
+      <!-- 🔥 EVENTO OCULTO INICIALMENTE -->
+      <input id="evento" placeholder="Nombre del evento" style="display:none;">
 
       <button onclick="previsualizar()">👁 Previsualizar</button>
       <button onclick="crearDocumento()">Generar Documento</button>
@@ -176,6 +175,12 @@
         return;
       }
 
+      // 🔥 VALIDAR EVENTO SI ES CERTIFICADO
+      if (tipo === "certificado" && !evento) {
+        alert("⚠️ Debes ingresar el nombre del evento");
+        return;
+      }
+
       // 🔐 VALIDAR DUPLICADO SOLO AFILIADOS
       if (tipo === "afiliado") {
         const query = await db.collection("documentos")
@@ -235,6 +240,21 @@
       enlace.download = "qr-documento.png";
       enlace.click();
     }
+
+    // 🔥 CONTROL DINÁMICO DEL CAMPO EVENTO
+    const tipoSelect = document.getElementById("tipo");
+    const campoEvento = document.getElementById("evento");
+
+    tipoSelect.addEventListener("change", function() {
+
+      if (this.value === "certificado") {
+        campoEvento.style.display = "block";
+      } else {
+        campoEvento.style.display = "none";
+        campoEvento.value = "";
+      }
+
+    });
 
   </script>
 
