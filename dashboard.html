@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Panel de Control</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #eef2f7;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #1e3a5f;
+      color: white;
+    }
+
+    button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .eliminar {
+      background: #dc2626;
+      color: white;
+    }
+
+    .buscar {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h2>Panel de Documentos</h2>
+
+    <input type="text" id="buscador" class="buscar" placeholder="Buscar por nombre o código...">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+
+      <tbody id="tabla"></tbody>
+    </table>
+
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <script>
+
+    const firebaseConfig = {
+    apiKey: "AIzaSyAxcjIRGV1eg59e8fJXZZaZzLcdXfa3lQI",
+      authDomain: "fundacion-isla-cascajal.firebaseapp.com",
+      projectId: "fundacion-isla-cascajal",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let datos = [];
+
+    function cargarDatos() {
+      db.collection("documentos").get().then(snapshot => {
+
+        datos = [];
+
+        snapshot.forEach(doc => {
+          datos.push({
+            codigo: doc.id,
+            ...doc.data()
+          });
+        });
+
+        mostrarDatos(datos);
+      });
+    }
+
+    function mostrarDatos(lista) {
+      const tabla = document.getElementById("tabla");
+      tabla.innerHTML = "";
+
+      lista.forEach(item => {
+        tabla.innerHTML += `
+          <tr>
+            <td>${item.codigo}</td>
+            <td>${item.nombre}</td>
+            <td>${item.tipo_documento}</td>
+            <td>${item.estado}</td>
+            <td>
+              <button class="eliminar" onclick="eliminar('${item.codigo}')">Eliminar</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function eliminar(codigo) {
+      if (confirm("¿Eliminar este documento?")) {
+        db.collection("documentos").doc(codigo).delete().then(() => {
+          cargarDatos();
+        });
+      }
+    }
+
+    document.getElementById("buscador").addEventListener("input", function() {
+      const valor = this.value.toLowerCase();
+
+      const filtrados = datos.filter(d =>
+        d.nombre.toLowerCase().includes(valor) ||
+        d.codigo.toLowerCase().includes(valor)
+      );
+
+      mostrarDatos(filtrados);
+    });
+
+    cargarDatos();
+
+  </script>
+
+</body>
+</html>
