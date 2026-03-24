@@ -11,7 +11,7 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 40px auto;
       background: white;
       border-radius: 10px;
@@ -21,6 +21,19 @@
 
     h2 {
       text-align: center;
+    }
+
+    .top-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .buscar, select {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
 
     table {
@@ -40,6 +53,16 @@
       color: white;
     }
 
+    .tipo-certificado {
+      color: #16a34a;
+      font-weight: bold;
+    }
+
+    .tipo-afiliado {
+      color: #2563eb;
+      font-weight: bold;
+    }
+
     button {
       padding: 5px 10px;
       border: none;
@@ -52,11 +75,6 @@
       color: white;
     }
 
-    .buscar {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-    }
   </style>
 </head>
 
@@ -66,14 +84,25 @@
 
     <h2>Panel de Documentos</h2>
 
-    <input type="text" id="buscador" class="buscar" placeholder="Buscar por nombre o código...">
+    <div class="top-controls">
+      <input type="text" id="buscador" class="buscar" placeholder="Buscar por nombre o código...">
+
+      <!-- 🔥 NUEVO FILTRO -->
+      <select id="filtroTipo">
+        <option value="todos">Todos</option>
+        <option value="certificado">Certificados</option>
+        <option value="afiliado">Afiliados</option>
+      </select>
+    </div>
 
     <table>
       <thead>
         <tr>
           <th>Código</th>
           <th>Nombre</th>
+          <th>Cédula</th>
           <th>Tipo</th>
+          <th>Detalle</th>
           <th>Estado</th>
           <th>Acción</th>
         </tr>
@@ -91,7 +120,7 @@
   <script>
 
     const firebaseConfig = {
-    apiKey: "AIzaSyAxcjIRGV1eg59e8fJXZZaZzLcdXfa3lQI",
+      apiKey: "AIzaSyAxcjIRGV1eg59e8fJXZZaZzLcdXfa3lQI",
       authDomain: "fundacion-isla-cascajal.firebaseapp.com",
       projectId: "fundacion-isla-cascajal",
     };
@@ -113,7 +142,7 @@
           });
         });
 
-        mostrarDatos(datos);
+        aplicarFiltros();
       });
     }
 
@@ -122,14 +151,31 @@
       tabla.innerHTML = "";
 
       lista.forEach(item => {
+
+        const tipoClase = item.tipo === "afiliado" ? "tipo-afiliado" : "tipo-certificado";
+
+        const detalle = item.tipo === "certificado"
+          ? (item.evento || "Evento no definido")
+          : "Miembro";
+
         tabla.innerHTML += `
           <tr>
             <td>${item.codigo}</td>
             <td>${item.nombre}</td>
-            <td>${item.tipo_documento}</td>
+            <td>${item.cedula || "-"}</td>
+
+            <td class="${tipoClase}">
+              ${item.tipo}
+            </td>
+
+            <td>${detalle}</td>
+
             <td>${item.estado}</td>
+
             <td>
-              <button class="eliminar" onclick="eliminar('${item.codigo}')">Eliminar</button>
+              <button class="eliminar" onclick="eliminar('${item.codigo}')">
+                Eliminar
+              </button>
             </td>
           </tr>
         `;
@@ -144,16 +190,27 @@
       }
     }
 
-    document.getElementById("buscador").addEventListener("input", function() {
-      const valor = this.value.toLowerCase();
+    function aplicarFiltros() {
+      const texto = document.getElementById("buscador").value.toLowerCase();
+      const tipo = document.getElementById("filtroTipo").value;
 
-      const filtrados = datos.filter(d =>
-        d.nombre.toLowerCase().includes(valor) ||
-        d.codigo.toLowerCase().includes(valor)
+      let filtrados = datos.filter(d =>
+        d.nombre?.toLowerCase().includes(texto) ||
+        d.codigo.toLowerCase().includes(texto)
       );
 
+      if (tipo !== "todos") {
+        filtrados = filtrados.filter(d => d.tipo === tipo);
+      }
+
       mostrarDatos(filtrados);
-    });
+    }
+
+    document.getElementById("buscador")
+      .addEventListener("input", aplicarFiltros);
+
+    document.getElementById("filtroTipo")
+      .addEventListener("change", aplicarFiltros);
 
     cargarDatos();
 

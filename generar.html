@@ -27,15 +27,15 @@
     }
 
     .header img {
-      width: 70px;
-      margin-bottom: 10px;
+      width: 100px;
+      margin-bottom: 5px;
     }
 
     .form {
       padding: 25px;
     }
 
-    input {
+    input, select {
       width: 90%;
       padding: 10px;
       margin: 10px 0;
@@ -84,27 +84,35 @@
 
   <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
       <img src="logo.png">
-      <h2>Generar Documento</h2>
-      <h2>Fundacion isla cascajal</h2>
-      <p>Sistema institucional</p>
+      <h2 style="margin: 10px 0 5px;">Generar Documento</h2>
+      <h2 style="margin: 0;">Fundación Isla Cascajal</h2>
+      <p style="margin-top:8px;">Sistema institucional</p>
     </div>
 
-    <!-- FORM -->
     <div class="form">
 
       <input id="nombre" placeholder="Nombre completo">
-      <input id="tipo" placeholder="Tipo de documento">
+      <input id="cedula" placeholder="Cédula">
 
+      <!-- 🔥 NUEVO -->
+      <select id="tipo">
+        <option value="">Seleccione tipo</option>
+        <option value="certificado">Certificado</option>
+        <option value="afiliado">Afiliado</option>
+      </select>
+
+      <!-- 🔥 SOLO PARA CERTIFICADO -->
+      <input id="evento" placeholder="Nombre del evento (solo certificados)">
+
+      <button onclick="previsualizar()">👁 Previsualizar</button>
       <button onclick="crearDocumento()">Generar Documento</button>
 
       <div id="resultado"></div>
 
     </div>
 
-    <!-- FOOTER -->
     <div class="footer">
       Generador oficial de documentos
     </div>
@@ -138,40 +146,78 @@
       return codigo;
     }
 
-    function crearDocumento() {
-
+    // 👁 PREVISUALIZACIÓN
+    function previsualizar() {
       const nombre = document.getElementById("nombre").value;
+      const cedula = document.getElementById("cedula").value;
       const tipo = document.getElementById("tipo").value;
+      const evento = document.getElementById("evento").value;
+
+      document.getElementById("resultado").innerHTML = `
+        <div style="background:#f1f5f9; padding:15px; border-radius:10px;">
+          <h3>Vista previa</h3>
+          <p><strong>Nombre:</strong> ${nombre}</p>
+          <p><strong>Cédula:</strong> ${cedula}</p>
+          <p><strong>Tipo:</strong> ${tipo}</p>
+          ${tipo === "certificado" ? `<p><strong>Evento:</strong> ${evento}</p>` : ""}
+        </div>
+      `;
+    }
+
+    async function crearDocumento() {
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const cedula = document.getElementById("cedula").value.trim();
+      const tipo = document.getElementById("tipo").value;
+      const evento = document.getElementById("evento").value;
+
+      if (!nombre || !cedula || !tipo) {
+        alert("⚠️ Completa todos los campos");
+        return;
+      }
+
+      // 🔐 VALIDAR DUPLICADO SOLO AFILIADOS
+      if (tipo === "afiliado") {
+        const query = await db.collection("documentos")
+          .where("cedula", "==", cedula)
+          .where("tipo", "==", "afiliado")
+          .get();
+
+        if (!query.empty) {
+          alert("⚠️ Esta persona ya está afiliada");
+          return;
+        }
+      }
+
       const codigo = generarCodigo();
 
-      db.collection("documentos").doc(codigo).set({
+      await db.collection("documentos").doc(codigo).set({
         nombre: nombre,
-        tipo_documento: tipo,
-        estado: "válido"
-      })
-      .then(() => {
+        cedula: cedula,
+        tipo: tipo,
+        evento: tipo === "certificado" ? evento : null,
+        estado: "válido",
+        fecha: new Date().toISOString()
+      });
 
-        const link = "https://zramos2305.github.io/VERIFICACIONQR/?doc=" + codigo;
+      const link = "https://zramos2305.github.io/VERIFICACIONQR/?doc=" + codigo;
 
-        document.getElementById("resultado").innerHTML = `
-          <h3 style="color:#16a34a;">✅ Documento creado</h3>
+      document.getElementById("resultado").innerHTML = `
+        <h3 style="color:#16a34a;">✅ Documento creado</h3>
 
-          <p><strong>${codigo}</strong></p>
+        <p><strong>${codigo}</strong></p>
 
-          <div id="qr"></div>
+        <div id="qr"></div>
 
-          <a href="${link}" target="_blank">🔍 Verificar documento</a><br>
+        <a href="${link}" target="_blank">🔍 Verificar documento</a><br>
 
-          <button class="descargar" onclick="descargarQR()">⬇ Descargar QR</button>
-        `;
+        <button class="descargar" onclick="descargarQR()">⬇ Descargar QR</button>
+      `;
 
-        // Generar QR
-        new QRCode(document.getElementById("qr"), {
-          text: link,
-          width: 180,
-          height: 180
-        });
-
+      new QRCode(document.getElementById("qr"), {
+        text: link,
+        width: 180,
+        height: 180
       });
 
     }

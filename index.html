@@ -30,8 +30,6 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <!-- generar  QR -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <script>
 
@@ -49,9 +47,7 @@
 
     if (!codigo) {
       document.getElementById("resultado").innerHTML = `
-        <div style="color:#dc2626; font-size:22px; margin-bottom:15px;">
-          ❌ Código no proporcionado
-        </div>
+        <div style="color:#dc2626; font-size:22px;">❌ Código no proporcionado</div>
       `;
     } else {
 
@@ -62,19 +58,44 @@
 
           const data = doc.data();
 
+          // 🔥 DETECTAR TIPO
+          const tipo = data.tipo || "certificado";
+
+          let contenidoExtra = "";
+          let badgeColor = "#16a34a";
+          let titulo = "DOCUMENTO VÁLIDO";
+
+          if (tipo === "certificado") {
+            contenidoExtra = `
+              <p style="margin:5px;"><strong>Evento:</strong> ${data.evento || "No especificado"}</p>
+            `;
+            badgeColor = "#16a34a";
+            titulo = "CERTIFICADO VÁLIDO";
+          }
+
+          if (tipo === "afiliado") {
+            contenidoExtra = `
+              <p style="margin:5px;"><strong>Estado:</strong> ${data.estado}</p>
+              <p style="margin:5px;">Miembro registrado de la fundación</p>
+            `;
+            badgeColor = "#2563eb";
+            titulo = "AFILIADO VERIFICADO";
+          }
+
           document.getElementById("resultado").innerHTML = `
-            <div style="color:#16a34a; font-size:22px; margin-bottom:15px;">
-              ✅ DOCUMENTO VÁLIDO
+            <div style="color:${badgeColor}; font-size:22px; margin-bottom:15px;">
+              ✅ ${titulo}
             </div>
 
             <h3 style="margin:10px 0;">${data.nombre}</h3>
 
             <p style="margin:5px;"><strong>Código:</strong> ${codigo}</p>
-            <p style="margin:5px;"><strong>Tipo:</strong> ${data.tipo_documento}</p>
-            <p style="margin:5px;"><strong>Estado:</strong> ${data.estado}</p>
+            <p style="margin:5px;"><strong>Tipo:</strong> ${tipo}</p>
+
+            ${contenidoExtra}
 
             <div style="margin-top:20px; padding:10px; background:#ecfdf5; border-radius:8px; font-size:14px;">
-              Este documento ha sido verificado correctamente en el sistema institucional.
+              Este registro ha sido validado correctamente en el sistema institucional.
             </div>
           `;
 
@@ -93,7 +114,7 @@
 
       })
       .catch(error => {
-        console.error(error);
+        console.error("Error:", error);
       });
 
     }
