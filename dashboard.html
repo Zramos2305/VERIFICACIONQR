@@ -21,57 +21,32 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      color: #1e3a5f;
     }
 
-    /* 🔥 HEADER ACCIONES */
-    .acciones {
+    /* 🔥 HEADER */
+    .header-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
       margin-bottom: 15px;
     }
 
-    .botones {
-      display: flex;
-      gap: 10px;
-    }
-
-    button {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
     .crear {
-      background: #16a34a;
+      background: #1e3a5f;
       color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.3s;
     }
 
     .crear:hover {
-      background: #15803d;
-    }
-
-    .cert {
-      background: #2563eb;
-      color: white;
-    }
-
-    .cert:hover {
-      background: #1d4ed8;
-    }
-
-    .afil {
-      background: #7c3aed;
-      color: white;
-    }
-
-    .afil:hover {
-      background: #6d28d9;
+      background: #162c47;
+      transform: translateY(-1px);
     }
 
     .top-controls {
@@ -121,6 +96,10 @@
     .eliminar {
       background: #dc2626;
       color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 10px;
+      cursor: pointer;
     }
 
     .eliminar:hover {
@@ -136,23 +115,11 @@
 
     <h2>Panel de Documentos</h2>
 
-    <!-- 🔥 ACCIONES -->
-    <div class="acciones">
-
+    <div class="header-top">
+      <div></div>
       <button class="crear" onclick="irAGenerar()">
-        ➕ Nuevo documento
+        ➕ Agregar documento
       </button>
-
-      <div class="botones">
-        <button class="cert" onclick="irAGenerar('certificado')">
-          🎓 Certificado
-        </button>
-
-        <button class="afil" onclick="irAGenerar('afiliado')">
-          👤 Afiliado
-        </button>
-      </div>
-
     </div>
 
     <!-- 🔍 FILTROS -->
@@ -284,13 +251,8 @@
     document.getElementById("filtroTipo")
       .addEventListener("change", aplicarFiltros);
 
-    // 🔥 REDIRECCIÓN
-    function irAGenerar(tipo = "") {
-      if (tipo) {
-        window.location.href = "generar.html?tipo=" + tipo;
-      } else {
-        window.location.href = "generar.html";
-      }
+    function irAGenerar() {
+      window.location.href = "generar.html";
     }
 
     cargarDatos();
