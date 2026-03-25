@@ -267,18 +267,52 @@ function descargarPorTipo(tipo) {
 
 function exportar(lista, nombre) {
 
-  let contenido = "Código;Nombre;Cédula;Tipo;Detalle;Estado;Fecha\n";
+  if (lista.length === 0) {
+    alert("No hay datos");
+    return;
+  }
 
+  let filas = [];
+
+  // Encabezados
+  filas.push([
+    "Código",
+    "Nombre",
+    "Cédula",
+    "Tipo",
+    "Detalle",
+    "Estado",
+    "Fecha"
+  ]);
+
+  // Datos
   lista.forEach(item => {
-    const detalle = item.tipo === "certificado" ? item.evento : "Miembro";
 
-    contenido += `${item.codigo};${item.nombre};${item.cedula};${item.tipo};${detalle};${item.estado};${formatearFecha(item.fecha)}\n`;
+    const detalle = item.tipo === "certificado"
+      ? (item.evento || "Evento")
+      : "Miembro";
+
+    filas.push([
+      item.codigo,
+      item.nombre,
+      item.cedula || "",
+      item.tipo,
+      detalle,
+      item.estado,
+      formatearFecha(item.fecha)
+    ]);
   });
 
-  const blob = new Blob([contenido], { type: "text/csv" });
+  // Convertir a CSV con comillas (🔥 clave para Excel)
+  let csv = filas.map(fila =>
+    fila.map(valor => `"${valor}"`).join(",")
+  ).join("\n");
+
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = nombre + ".xls";
+  link.download = nombre + ".csv";
   link.click();
 }
 
