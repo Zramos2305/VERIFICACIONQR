@@ -14,19 +14,70 @@
       max-width: 1000px;
       margin: 40px auto;
       background: white;
-      border-radius: 10px;
-      padding: 20px;
+      border-radius: 12px;
+      padding: 25px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
     h2 {
       text-align: center;
+      margin-bottom: 10px;
+    }
+
+    /* 🔥 HEADER ACCIONES */
+    .acciones {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .botones {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .crear {
+      background: #16a34a;
+      color: white;
+    }
+
+    .crear:hover {
+      background: #15803d;
+    }
+
+    .cert {
+      background: #2563eb;
+      color: white;
+    }
+
+    .cert:hover {
+      background: #1d4ed8;
+    }
+
+    .afil {
+      background: #7c3aed;
+      color: white;
+    }
+
+    .afil:hover {
+      background: #6d28d9;
     }
 
     .top-controls {
       display: flex;
       gap: 10px;
-      margin-top: 15px;
+      margin-top: 10px;
     }
 
     .buscar, select {
@@ -53,6 +104,10 @@
       color: white;
     }
 
+    tr:hover {
+      background: #f9fafb;
+    }
+
     .tipo-certificado {
       color: #16a34a;
       font-weight: bold;
@@ -63,16 +118,13 @@
       font-weight: bold;
     }
 
-    button {
-      padding: 5px 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
     .eliminar {
       background: #dc2626;
       color: white;
+    }
+
+    .eliminar:hover {
+      background: #b91c1c;
     }
 
   </style>
@@ -84,10 +136,29 @@
 
     <h2>Panel de Documentos</h2>
 
+    <!-- 🔥 ACCIONES -->
+    <div class="acciones">
+
+      <button class="crear" onclick="irAGenerar()">
+        ➕ Nuevo documento
+      </button>
+
+      <div class="botones">
+        <button class="cert" onclick="irAGenerar('certificado')">
+          🎓 Certificado
+        </button>
+
+        <button class="afil" onclick="irAGenerar('afiliado')">
+          👤 Afiliado
+        </button>
+      </div>
+
+    </div>
+
+    <!-- 🔍 FILTROS -->
     <div class="top-controls">
       <input type="text" id="buscador" class="buscar" placeholder="Buscar por nombre o código...">
 
-      <!-- 🔥 NUEVO FILTRO -->
       <select id="filtroTipo">
         <option value="todos">Todos</option>
         <option value="certificado">Certificados</option>
@@ -95,6 +166,7 @@
       </select>
     </div>
 
+    <!-- 📊 TABLA -->
     <table>
       <thead>
         <tr>
@@ -211,6 +283,15 @@
 
     document.getElementById("filtroTipo")
       .addEventListener("change", aplicarFiltros);
+
+    // 🔥 REDIRECCIÓN
+    function irAGenerar(tipo = "") {
+      if (tipo) {
+        window.location.href = "generar.html?tipo=" + tipo;
+      } else {
+        window.location.href = "generar.html";
+      }
+    }
 
     cargarDatos();
 
