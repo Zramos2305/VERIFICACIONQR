@@ -11,7 +11,7 @@
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: 40px auto;
       background: white;
       border-radius: 12px;
@@ -21,60 +21,35 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 15px;
       color: #1e3a5f;
     }
 
     .header-top {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
       flex-wrap: wrap;
       gap: 10px;
+      margin-bottom: 15px;
     }
 
     .grupo-botones {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     button {
-      padding: 9px 14px;
-      border-radius: 6px;
+      padding: 8px 12px;
       border: none;
+      border-radius: 6px;
       cursor: pointer;
-      transition: 0.2s;
-      font-size: 14px;
     }
 
-    .crear {
-      background: #1e3a5f;
-      color: white;
-    }
-
-    .crear:hover {
-      background: #162c47;
-      transform: translateY(-1px);
-    }
-
-    .excel {
-      background: #16a34a;
-      color: white;
-    }
-
-    .excel:hover {
-      background: #15803d;
-    }
-
-    .salir {
-      background: #dc2626;
-      color: white;
-    }
-
-    .salir:hover {
-      background: #b91c1c;
-    }
+    .crear { background:#1e3a5f; color:white; }
+    .excel { background:#16a34a; color:white; }
+    .cert { background:#2563eb; color:white; }
+    .afil { background:#7c3aed; color:white; }
+    .salir { background:#dc2626; color:white; }
 
     .top-controls {
       display: flex;
@@ -82,7 +57,7 @@
       margin-top: 10px;
     }
 
-    .buscar, select {
+    input, select {
       flex: 1;
       padding: 10px;
       border-radius: 6px;
@@ -91,15 +66,14 @@
 
     table {
       width: 100%;
-      border-collapse: collapse;
       margin-top: 20px;
+      border-collapse: collapse;
     }
 
     th, td {
       padding: 10px;
       border-bottom: 1px solid #ddd;
       text-align: center;
-      font-size: 14px;
     }
 
     th {
@@ -107,28 +81,17 @@
       color: white;
     }
 
-    tr:hover {
-      background: #f9fafb;
-    }
-
-    .tipo-certificado {
-      color: #16a34a;
-      font-weight: bold;
-    }
-
-    .tipo-afiliado {
-      color: #2563eb;
-      font-weight: bold;
-    }
+    .tipo-certificado { color:#16a34a; font-weight:bold; }
+    .tipo-afiliado { color:#2563eb; font-weight:bold; }
 
     .eliminar {
-      background: #dc2626;
-      color: white;
-      padding: 6px 10px;
+      background:#dc2626;
+      color:white;
     }
 
-    .eliminar:hover {
-      background: #b91c1c;
+    .qr-btn {
+      background:#0ea5e9;
+      color:white;
     }
 
   </style>
@@ -136,207 +99,203 @@
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <h2>Panel de Documentos</h2>
+  <h2>Panel de Documentos</h2>
 
-    <!-- 🔥 HEADER -->
-    <div class="header-top">
+  <div class="header-top">
 
-      <div class="grupo-botones">
-        <button class="excel" onclick="descargarExcel()">📊 Excel</button>
-        <button class="salir" onclick="logout()">🚪 Salir</button>
-      </div>
-
-      <button class="crear" onclick="irAGenerar()">
-        ➕ Agregar documento
-      </button>
-
+    <div class="grupo-botones">
+      <button class="excel" onclick="descargarExcel()">📊 Todos</button>
+      <button class="cert" onclick="descargarPorTipo('certificado')">🎓 Certificados</button>
+      <button class="afil" onclick="descargarPorTipo('afiliado')">👤 Afiliados</button>
+      <button class="salir" onclick="logout()">🚪 Salir</button>
     </div>
 
-    <!-- 🔍 FILTROS -->
-    <div class="top-controls">
-      <input type="text" id="buscador" class="buscar" placeholder="Buscar por nombre o código...">
-
-      <select id="filtroTipo">
-        <option value="todos">Todos</option>
-        <option value="certificado">Certificados</option>
-        <option value="afiliado">Afiliados</option>
-      </select>
-    </div>
-
-    <!-- 📊 TABLA -->
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Cédula</th>
-          <th>Tipo</th>
-          <th>Detalle</th>
-          <th>Estado</th>
-          <th>Fecha</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-
-      <tbody id="tabla"></tbody>
-    </table>
+    <button class="crear" onclick="irAGenerar()">➕ Agregar</button>
 
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <div class="top-controls">
+    <input id="buscador" placeholder="Buscar...">
+    <select id="filtroTipo">
+      <option value="todos">Todos</option>
+      <option value="certificado">Certificados</option>
+      <option value="afiliado">Afiliados</option>
+    </select>
+  </div>
 
-  <script>
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Cédula</th>
+        <th>Tipo</th>
+        <th>Detalle</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>QR</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody id="tabla"></tbody>
+  </table>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAxcjIRGV1eg59e8fJXZZaZzLcdXfa3lQI",
-      authDomain: "fundacion-isla-cascajal.firebaseapp.com",
-      projectId: "fundacion-isla-cascajal",
-    };
+</div>
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-    let datos = [];
+<script>
 
-    function formatearFecha(fechaISO) {
-      if (!fechaISO) return "-";
-      const fecha = new Date(fechaISO);
-      return fecha.toLocaleString();
-    }
+const firebaseConfig = {
+  apiKey: "AIzaSyAxcjIRGV1eg59e8fJXZZaZzLcdXfa3lQI",
+  authDomain: "fundacion-isla-cascajal.firebaseapp.com",
+  projectId: "fundacion-isla-cascajal",
+};
 
-    function cargarDatos() {
-      db.collection("documentos").get().then(snapshot => {
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-        datos = [];
+let datos = [];
 
-        snapshot.forEach(doc => {
-          datos.push({
-            codigo: doc.id,
-            ...doc.data()
-          });
-        });
+function formatearFecha(f) {
+  if (!f) return "-";
+  return new Date(f).toLocaleString();
+}
 
-        aplicarFiltros();
-      });
-    }
-
-    function mostrarDatos(lista) {
-      const tabla = document.getElementById("tabla");
-      tabla.innerHTML = "";
-
-      lista.forEach(item => {
-
-        const tipoClase = item.tipo === "afiliado" ? "tipo-afiliado" : "tipo-certificado";
-
-        const detalle = item.tipo === "certificado"
-          ? (item.evento || "Evento no definido")
-          : "Miembro";
-
-        tabla.innerHTML += `
-          <tr>
-            <td>${item.codigo}</td>
-            <td>${item.nombre}</td>
-            <td>${item.cedula || "-"}</td>
-
-            <td class="${tipoClase}">
-              ${item.tipo}
-            </td>
-
-            <td>${detalle}</td>
-            <td>${item.estado}</td>
-            <td>${formatearFecha(item.fecha)}</td>
-
-            <td>
-              <button class="eliminar" onclick="eliminar('${item.codigo}')">
-                Eliminar
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    function eliminar(codigo) {
-      if (confirm("¿Eliminar este documento?")) {
-        db.collection("documentos").doc(codigo).delete().then(() => {
-          cargarDatos();
-        });
-      }
-    }
-
-    function aplicarFiltros() {
-      const texto = document.getElementById("buscador").value.toLowerCase();
-      const tipo = document.getElementById("filtroTipo").value;
-
-      let filtrados = datos.filter(d =>
-        d.nombre?.toLowerCase().includes(texto) ||
-        d.codigo.toLowerCase().includes(texto)
-      );
-
-      if (tipo !== "todos") {
-        filtrados = filtrados.filter(d => d.tipo === tipo);
-      }
-
-      mostrarDatos(filtrados);
-    }
-
-    document.getElementById("buscador")
-      .addEventListener("input", aplicarFiltros);
-
-    document.getElementById("filtroTipo")
-      .addEventListener("change", aplicarFiltros);
-
-    function irAGenerar() {
-      window.location.href = "generar.html";
-    }
-
-    function logout() {
-      firebase.auth().signOut().then(() => {
-        window.location.href = "login.html";
-      });
-    }
-
-    function descargarExcel() {
-
-      if (datos.length === 0) {
-        alert("No hay datos para exportar");
-        return;
-      }
-
-      let contenido = "Código;Nombre;Cédula;Tipo;Detalle;Estado;Fecha\n";
-
-      datos.forEach(item => {
-
-        const detalle = item.tipo === "certificado"
-          ? (item.evento || "Evento no definido")
-          : "Miembro";
-
-        contenido += `${item.codigo};${item.nombre};${item.cedula || ""};${item.tipo};${detalle};${item.estado};${formatearFecha(item.fecha)}\n`;
-      });
-
-      const blob = new Blob([contenido], { type: "text/csv;charset=utf-8;" });
-
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "documentos.csv";
-      link.click();
-    }
-
-    // 🔐 PROTECCIÓN LOGIN
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        cargarDatos();
-      } else {
-        window.location.href = "login.html";
-      }
+function cargarDatos() {
+  db.collection("documentos").get().then(snap => {
+    datos = [];
+    snap.forEach(doc => {
+      datos.push({ codigo: doc.id, ...doc.data() });
     });
+    aplicarFiltros();
+  });
+}
 
-  </script>
+function mostrarDatos(lista) {
+  const tabla = document.getElementById("tabla");
+  tabla.innerHTML = "";
+
+  lista.forEach(item => {
+
+    const link = "https://zramos2305.github.io/VERIFICACIONQR/?doc=" + item.codigo;
+
+    tabla.innerHTML += `
+      <tr>
+        <td>${item.codigo}</td>
+        <td>${item.nombre}</td>
+        <td>${item.cedula || "-"}</td>
+        <td class="${item.tipo === "afiliado" ? "tipo-afiliado" : "tipo-certificado"}">${item.tipo}</td>
+        <td>${item.tipo === "certificado" ? item.evento : "Miembro"}</td>
+        <td>${item.estado}</td>
+        <td>${formatearFecha(item.fecha)}</td>
+
+        <td>
+          <button class="qr-btn" onclick="descargarQR('${link}', '${item.codigo}')">
+            QR
+          </button>
+        </td>
+
+        <td>
+          <button class="eliminar" onclick="eliminar('${item.codigo}')">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function descargarQR(link, codigo) {
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const img = new Image();
+  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(link);
+
+  img.onload = function () {
+    canvas.width = 200;
+    canvas.height = 200;
+    ctx.drawImage(img, 0, 0);
+
+    const enlace = document.createElement("a");
+    enlace.href = canvas.toDataURL("image/png");
+    enlace.download = "QR_" + codigo + ".png";
+    enlace.click();
+  };
+}
+
+function eliminar(codigo) {
+  if (confirm("¿Eliminar?")) {
+    db.collection("documentos").doc(codigo).delete().then(cargarDatos);
+  }
+}
+
+function aplicarFiltros() {
+  const texto = buscador.value.toLowerCase();
+  const tipo = filtroTipo.value;
+
+  let filtrados = datos.filter(d =>
+    d.nombre?.toLowerCase().includes(texto) ||
+    d.codigo.toLowerCase().includes(texto)
+  );
+
+  if (tipo !== "todos") {
+    filtrados = filtrados.filter(d => d.tipo === tipo);
+  }
+
+  mostrarDatos(filtrados);
+}
+
+buscador.addEventListener("input", aplicarFiltros);
+filtroTipo.addEventListener("change", aplicarFiltros);
+
+function descargarExcel() {
+  exportar(datos, "todos");
+}
+
+function descargarPorTipo(tipo) {
+  const filtrados = datos.filter(d => d.tipo === tipo);
+  exportar(filtrados, tipo);
+}
+
+function exportar(lista, nombre) {
+
+  let contenido = "Código;Nombre;Cédula;Tipo;Detalle;Estado;Fecha\n";
+
+  lista.forEach(item => {
+    const detalle = item.tipo === "certificado" ? item.evento : "Miembro";
+
+    contenido += `${item.codigo};${item.nombre};${item.cedula};${item.tipo};${detalle};${item.estado};${formatearFecha(item.fecha)}\n`;
+  });
+
+  const blob = new Blob([contenido], { type: "text/csv" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = nombre + ".xls";
+  link.click();
+}
+
+function logout() {
+  firebase.auth().signOut().then(() => location.href="login.html");
+}
+
+function irAGenerar() {
+  location.href = "generar.html";
+}
+
+firebase.auth().onAuthStateChanged(user => {
+  if (user) cargarDatos();
+  else location.href = "login.html";
+});
+
+</script>
 
 </body>
 </html>
