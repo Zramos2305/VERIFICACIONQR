@@ -155,6 +155,7 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
   <script>
 
@@ -254,8 +255,14 @@
     function irAGenerar() {
       window.location.href = "generar.html";
     }
-
+// 🔐 PROTEGER Y CARGAR DATOS
+    firebase.auth().onAuthStateChanged(user => {
+  if (user) {
     cargarDatos();
+  } else {
+    window.location.href = "login.html";
+  }
+});
 
   </script>
 
