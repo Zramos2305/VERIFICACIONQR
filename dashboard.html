@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Panel de Control</title>
+  <h3 id="usuarioActivo" style="text-align:right; color:#1e3a5f;"></h3>
 
   <style>
     body {
@@ -49,7 +50,7 @@
     .excel { background:#16a34a; color:white; }
     .cert { background:#2563eb; color:white; }
     .afil { background:#7c3aed; color:white; }
-    .salir { background:#dc2626; color:white; }
+    .salir { background:#05754a; color:white; }
 
     .top-controls {
       display: flex;
@@ -210,12 +211,24 @@ function descargarQR(link, codigo) {
 
   const urlQR = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(link);
 
-  const enlace = document.createElement("a");
-  enlace.href = urlQR;
-  enlace.download = "QR_" + codigo + ".png";
-  document.body.appendChild(enlace);
-  enlace.click();
-  document.body.removeChild(enlace);
+  fetch(urlQR)
+    .then(res => res.blob())
+    .then(blob => {
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = "QR_" + codigo + ".png";
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    })
+    .catch(() => {
+      alert("Error al descargar QR");
+    });
 }
 
 function eliminar(codigo) {
@@ -280,14 +293,18 @@ function irAGenerar() {
 firebase.auth().onAuthStateChanged(user => {
 
   if (user) {
-    console.log("Usuario OK");
+
+    const nombre = user.displayName || user.email;
+
+    document.getElementById("usuarioActivo").innerText =
+      "👤 " + nombre;
 
     setTimeout(() => {
       cargarDatos();
     }, 500);
 
   } else {
-    window.location.href = "login.html";
+    location.href = "login.html";
   }
 
 });
