@@ -11,7 +11,7 @@
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 40px auto;
       background: white;
       border-radius: 12px;
@@ -25,28 +25,55 @@
       color: #1e3a5f;
     }
 
-    /* 🔥 HEADER */
     .header-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .grupo-botones {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 9px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 14px;
     }
 
     .crear {
       background: #1e3a5f;
       color: white;
-      padding: 10px 18px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      transition: 0.3s;
     }
 
     .crear:hover {
       background: #162c47;
       transform: translateY(-1px);
+    }
+
+    .excel {
+      background: #16a34a;
+      color: white;
+    }
+
+    .excel:hover {
+      background: #15803d;
+    }
+
+    .salir {
+      background: #dc2626;
+      color: white;
+    }
+
+    .salir:hover {
+      background: #b91c1c;
     }
 
     .top-controls {
@@ -72,6 +99,7 @@
       padding: 10px;
       border-bottom: 1px solid #ddd;
       text-align: center;
+      font-size: 14px;
     }
 
     th {
@@ -96,10 +124,7 @@
     .eliminar {
       background: #dc2626;
       color: white;
-      border: none;
-      border-radius: 5px;
       padding: 6px 10px;
-      cursor: pointer;
     }
 
     .eliminar:hover {
@@ -115,11 +140,18 @@
 
     <h2>Panel de Documentos</h2>
 
+    <!-- 🔥 HEADER -->
     <div class="header-top">
-      <div></div>
+
+      <div class="grupo-botones">
+        <button class="excel" onclick="descargarExcel()">📊 Excel</button>
+        <button class="salir" onclick="logout()">🚪 Salir</button>
+      </div>
+
       <button class="crear" onclick="irAGenerar()">
         ➕ Agregar documento
       </button>
+
     </div>
 
     <!-- 🔍 FILTROS -->
@@ -143,6 +175,7 @@
           <th>Tipo</th>
           <th>Detalle</th>
           <th>Estado</th>
+          <th>Fecha</th>
           <th>Acción</th>
         </tr>
       </thead>
@@ -169,6 +202,12 @@
     const db = firebase.firestore();
 
     let datos = [];
+
+    function formatearFecha(fechaISO) {
+      if (!fechaISO) return "-";
+      const fecha = new Date(fechaISO);
+      return fecha.toLocaleString();
+    }
 
     function cargarDatos() {
       db.collection("documentos").get().then(snapshot => {
@@ -209,8 +248,8 @@
             </td>
 
             <td>${detalle}</td>
-
             <td>${item.estado}</td>
+            <td>${formatearFecha(item.fecha)}</td>
 
             <td>
               <button class="eliminar" onclick="eliminar('${item.codigo}')">
@@ -255,14 +294,47 @@
     function irAGenerar() {
       window.location.href = "generar.html";
     }
-// 🔐 PROTEGER Y CARGAR DATOS
+
+    function logout() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = "login.html";
+      });
+    }
+
+    function descargarExcel() {
+
+      if (datos.length === 0) {
+        alert("No hay datos para exportar");
+        return;
+      }
+
+      let contenido = "Código,Nombre,Cédula,Tipo,Detalle,Estado,Fecha\n";
+
+      datos.forEach(item => {
+
+        const detalle = item.tipo === "certificado"
+          ? (item.evento || "Evento no definido")
+          : "Miembro";
+
+        contenido += `${item.codigo},${item.nombre},${item.cedula || ""},${item.tipo},${detalle},${item.estado},${formatearFecha(item.fecha)}\n`;
+      });
+
+      const blob = new Blob([contenido], { type: "text/csv;charset=utf-8;" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "documentos.csv";
+      link.click();
+    }
+
+    // 🔐 PROTECCIÓN LOGIN
     firebase.auth().onAuthStateChanged(user => {
-  if (user) {
-    cargarDatos();
-  } else {
-    window.location.href = "login.html";
-  }
-});
+      if (user) {
+        cargarDatos();
+      } else {
+        window.location.href = "login.html";
+      }
+    });
 
   </script>
 
