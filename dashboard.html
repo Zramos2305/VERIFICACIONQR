@@ -278,10 +278,19 @@ function irAGenerar() {
 }
 
 firebase.auth().onAuthStateChanged(user => {
-  if (user) cargarDatos();
-  else location.href = "login.html";
-});
 
+  if (user) {
+    console.log("Usuario OK");
+
+    setTimeout(() => {
+      cargarDatos();
+    }, 500);
+
+  } else {
+    window.location.href = "login.html";
+  }
+
+});
 </script>
 
 </body>
