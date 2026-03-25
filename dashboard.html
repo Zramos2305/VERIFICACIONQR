@@ -308,7 +308,7 @@
         return;
       }
 
-      let contenido = "Código,Nombre,Cédula,Tipo,Detalle,Estado,Fecha\n";
+      let contenido = "Código;Nombre;Cédula;Tipo;Detalle;Estado;Fecha\n";
 
       datos.forEach(item => {
 
@@ -316,7 +316,7 @@
           ? (item.evento || "Evento no definido")
           : "Miembro";
 
-        contenido += `${item.codigo},${item.nombre},${item.cedula || ""},${item.tipo},${detalle},${item.estado},${formatearFecha(item.fecha)}\n`;
+        contenido += `${item.codigo};${item.nombre};${item.cedula || ""};${item.tipo};${detalle};${item.estado};${formatearFecha(item.fecha)}\n`;
       });
 
       const blob = new Blob([contenido], { type: "text/csv;charset=utf-8;" });
